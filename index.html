@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UniEllo — A rede que conecta estudantes</title>
+  <meta name="description" content="UniEllo conecta estudantes universitários para criar projetos, grupos de estudo e networking real dentro da universidade." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── Reset & Variables ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:      #0F172A;
+      --navy-2:    #1E293B;
+      --navy-3:    #263248;
+      --violet:    #8B5CF6;
+      --violet-lt: #A78BFA;
+      --violet-dk: #7C3AED;
+      --violet-bg: rgba(139,92,246,0.12);
+      --violet-bd: rgba(139,92,246,0.30);
+      --text:      #F1F5F9;
+      --text-2:    #94A3B8;
+      --text-3:    #64748B;
+      --border:    rgba(255,255,255,0.07);
+      --border-2:  rgba(255,255,255,0.12);
+      --radius:    16px;
+      --font:      'Plus Jakarta Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--navy);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Noise texture overlay ─────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    .page { position: relative; z-index: 1; }
+
+    /* ── NAV ───────────────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 5%;
+      height: 68px;
+      background: rgba(15,23,42,0.8);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: var(--text);
+    }
+    .logo em { font-style: normal; color: var(--violet); }
+
+    .nav-badge {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--violet-bg);
+      border: 1px solid var(--violet-bd);
+      color: var(--violet-lt);
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 100px;
+      letter-spacing: 0.02em;
+    }
+
+    .nav-badge .pulse {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--violet);
+      box-shadow: 0 0 0 0 var(--violet);
+      animation: pulse-ring 1.8s ease-out infinite;
+    }
+
+    @keyframes pulse-ring {
+      0% { box-shadow: 0 0 0 0 rgba(139,92,246,0.6); }
+      70% { box-shadow: 0 0 0 7px rgba(139,92,246,0); }
+      100% { box-shadow: 0 0 0 0 rgba(139,92,246,0); }
+    }
+
+    .btn-nav {
+      background: var(--violet);
+      color: #fff;
+      font-family: var(--font);
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 9px 20px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-nav:hover { background: var(--violet-lt); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(139,92,246,0.35); }
+
+    /* ── HERO ──────────────────────────────────────────────────────── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 5% 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Glow orbs */
+    #hero::before, #hero::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      filter: blur(100px);
+    }
+    #hero::before {
+      width: 500px; height: 500px;
+      background: rgba(139,92,246,0.15);
+      top: -100px; left: -100px;
+    }
+    #hero::after {
+      width: 400px; height: 400px;
+      background: rgba(99,102,241,0.1);
+      bottom: 0; right: -50px;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--violet-bg);
+      border: 1px solid var(--violet-bd);
+      color: var(--violet-lt);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 7px 16px;
+      border-radius: 100px;
+      margin-bottom: 28px;
+      letter-spacing: 0.03em;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.15s ease forwards;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 6vw, 4.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      max-width: 780px;
+      margin-bottom: 22px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.3s ease forwards;
+    }
+
+    h1 .accent { color: var(--violet-lt); }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--text-2);
+      max-width: 520px;
+      font-weight: 400;
+      margin-bottom: 44px;
+      line-height: 1.7;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.45s ease forwards;
+    }
+
+    .hero-cta {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.6s ease forwards;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--violet);
+      color: #fff;
+      font-family: var(--font);
+      font-weight: 700;
+      font-size: 1.05rem;
+      padding: 16px 36px;
+      border-radius: 14px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.25s;
+      box-shadow: 0 0 0 0 rgba(139,92,246,0);
+    }
+
+    .btn-primary:hover {
+      background: var(--violet-lt);
+      transform: translateY(-2px);
+      box-shadow: 0 16px 48px rgba(139,92,246,0.4);
+    }
+
+    .btn-primary .arrow { transition: transform 0.2s; }
+    .btn-primary:hover .arrow { transform: translateX(4px); }
+
+    .scarcity-msg {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.8rem;
+      color: var(--text-3);
+      font-weight: 500;
+    }
+
+    .scarcity-msg .fire { font-size: 0.9rem; }
+
+    /* Hero stats */
+    .hero-stats {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      margin-top: 72px;
+      padding-top: 40px;
+      border-top: 1px solid var(--border);
+      opacity: 0;
+      animation: fadeUp 0.7s 0.8s ease forwards;
+    }
+
+    .stat { text-align: center; }
+    .stat-num {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--violet-lt);
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.78rem;
+      color: var(--text-3);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+    .stat-sep { width: 1px; height: 40px; background: var(--border-2); }
+
+    /* ── SECTION COMMONS ───────────────────────────────────────────── */
+    .section {
+      padding: 100px 5%;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--violet);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .section-tag::before {
+      content: '';
+      width: 20px; height: 2px;
+      background: var(--violet);
+      border-radius: 2px;
+    }
+
+    h2 {
+      font-size: clamp(1.7rem, 4vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    h2 .accent { color: var(--violet-lt); }
+
+    .section-desc {
+      font-size: 1.05rem;
+      color: var(--text-2);
+      max-width: 500px;
+      font-weight: 400;
+      line-height: 1.7;
+      margin-bottom: 56px;
+    }
+
+    /* ── PROBLEM ───────────────────────────────────────────────────── */
+    #problem { background: transparent; }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .problem-card {
+      background: var(--navy-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      transition: border-color 0.3s, transform 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .problem-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, rgba(239,68,68,0.6), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .problem-card:hover { border-color: rgba(239,68,68,0.25); transform: translateY(-3px); }
+    .problem-card:hover::before { opacity: 1; }
+
+    .p-emoji { font-size: 1.8rem; margin-bottom: 16px; display: block; }
+    .p-title { font-weight: 700; font-size: 1rem; margin-bottom: 8px; }
+    .p-body { font-size: 0.88rem; color: var(--text-2); line-height: 1.65; }
+
+    /* ── SOLUTION ──────────────────────────────────────────────────── */
+    #solution {
+      padding: 100px 5%;
+      background: var(--navy-2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .solution-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .sol-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 32px;
+    }
+
+    .sol-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 18px 20px;
+      background: var(--navy-3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      transition: border-color 0.2s;
+    }
+
+    .sol-item:hover { border-color: var(--violet-bd); }
+
+    .sol-icon {
+      width: 36px; height: 36px;
+      background: var(--violet-bg);
+      border: 1px solid var(--violet-bd);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 1rem;
+    }
+
+    .sol-text strong {
+      display: block;
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 2px;
+    }
+    .sol-text span { font-size: 0.82rem; color: var(--text-2); line-height: 1.5; }
+
+    /* Phone mockup */
+    .phone-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .phone {
+      width: 260px;
+      background: #1a2540;
+      border: 1px solid var(--border-2);
+      border-radius: 32px;
+      padding: 20px 16px;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+      position: relative;
+    }
+
+    .phone-notch {
+      width: 80px; height: 6px;
+      background: var(--border-2);
+      border-radius: 4px;
+      margin: 0 auto 20px;
+    }
+
+    .phone-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .phone-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--violet), #6366f1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .phone-name { font-size: 0.82rem; font-weight: 700; }
+    .phone-uni { font-size: 0.68rem; color: var(--text-3); }
+
+    .phone-post {
+      background: var(--navy-3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+
+    .phone-post-title { font-size: 0.75rem; font-weight: 700; margin-bottom: 5px; }
+    .phone-post-body { font-size: 0.68rem; color: var(--text-2); line-height: 1.5; margin-bottom: 10px; }
+
+    .phone-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+    .phone-tag {
+      background: var(--violet-bg);
+      border: 1px solid var(--violet-bd);
+      color: var(--violet-lt);
+      font-size: 0.6rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 100px;
+    }
+
+    .phone-btn {
+      width: 100%;
+      background: var(--violet);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px;
+      font-family: var(--font);
+      font-weight: 700;
+      font-size: 0.75rem;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+
+    /* ── FEATURES ──────────────────────────────────────────────────── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .feat-card {
+      background: var(--navy-2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feat-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, var(--violet-bg) 0%, transparent 65%);
+      opacity: 0;
+      transition: opacity 0.4s;
+      pointer-events: none;
+    }
+
+    .feat-card:hover { border-color: var(--violet-bd); transform: translateY(-4px); box-shadow: 0 20px 60px rgba(139,92,246,0.1); }
+    .feat-card:hover::after { opacity: 1; }
+
+    .feat-num { font-size: 0.65rem; color: var(--violet); font-weight: 700; letter-spacing: 0.12em; margin-bottom: 18px; }
+    .feat-icon-wrap {
+      width: 48px; height: 48px;
+      background: var(--violet-bg);
+      border: 1px solid var(--violet-bd);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 18px;
+      position: relative;
+      z-index: 1;
+    }
+    .feat-title { font-weight: 700; font-size: 1.05rem; margin-bottom: 10px; position: relative; z-index: 1; }
+    .feat-body { font-size: 0.88rem; color: var(--text-2); line-height: 1.65; position: relative; z-index: 1; }
+
+    /* ── COUNTER ───────────────────────────────────────────────────── */
+    #counter {
+      padding: 80px 5%;
+      text-align: center;
+      border-top: 1px solid var(--border);
+      background: var(--navy-2);
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #counter::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px; height: 300px;
+      background: radial-gradient(ellipse, rgba(139,92,246,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .counter-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--violet);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .big-num {
+      font-size: clamp(4rem, 12vw, 8rem);
+      font-weight: 800;
+      letter-spacing: -0.06em;
+      line-height: 1;
+      color: var(--violet-lt);
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .counter-label {
+      font-size: 1.15rem;
+      color: var(--text-2);
+      margin-bottom: 20px;
+    }
+
+    .counter-warning {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.2);
+      color: #fca5a5;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 100px;
+    }
+
+    /* ── WAITLIST ──────────────────────────────────────────────────── */
+    #waitlist {
+      padding: 100px 5%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #waitlist::before {
+      content: '';
+      position: absolute;
+      top: -200px; left: 50%;
+      transform: translateX(-50%);
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .waitlist-wrap {
+      max-width: 560px;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+    }
+
+    .form-card {
+      background: var(--navy-2);
+      border: 1px solid var(--border-2);
+      border-radius: 24px;
+      padding: 40px;
+      text-align: left;
+      margin-top: 40px;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.4);
+    }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-bottom: 16px;
+    }
+
+    label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-3);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    input {
+      background: var(--navy-3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 13px 16px;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 0.95rem;
+      outline: none;
+      width: 100%;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input::placeholder { color: var(--text-3); }
+    input:focus { border-color: var(--violet-bd); box-shadow: 0 0 0 3px rgba(139,92,246,0.15); }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--violet);
+      color: #fff;
+      font-family: var(--font);
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 16px;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.25s;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+      background: var(--violet-lt);
+      transform: translateY(-2px);
+      box-shadow: 0 16px 48px rgba(139,92,246,0.4);
+    }
+
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .form-note {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-3);
+      margin-top: 16px;
+    }
+
+    /* Form error/success messages */
+    .field-error {
+      font-size: 0.72rem;
+      color: #f87171;
+      margin-top: -10px;
+      margin-bottom: 4px;
+      display: none;
+    }
+    .field-error.show { display: block; }
+
+    .form-alert {
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .form-alert.error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: #fca5a5; display: block; }
+    .form-alert.info  { background: var(--violet-bg); border: 1px solid var(--violet-bd); color: var(--violet-lt); display: block; }
+
+    /* ── SUCCESS STATE ─────────────────────────────────────────────── */
+    #success {
+      display: none;
+      text-align: center;
+      padding: 48px 20px;
+    }
+
+    .success-icon { font-size: 4rem; display: block; margin-bottom: 20px; }
+    .success-title { font-size: 2rem; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 12px; }
+    .success-desc { color: var(--text-2); font-size: 1rem; margin-bottom: 32px; line-height: 1.7; }
+
+    .btn-wpp {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #25d366;
+      color: #fff;
+      font-family: var(--font);
+      font-weight: 700;
+      font-size: 1.05rem;
+      padding: 15px 32px;
+      border-radius: 14px;
+      text-decoration: none;
+      transition: all 0.2s;
+      box-shadow: 0 8px 32px rgba(37,211,102,0.25);
+    }
+    .btn-wpp:hover { background: #22c55e; transform: translateY(-2px); box-shadow: 0 16px 48px rgba(37,211,102,0.35); }
+
+    /* ── FOOTER ────────────────────────────────────────────────────── */
+    footer {
+      padding: 40px 5%;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-copy { font-size: 0.8rem; color: var(--text-3); }
+
+    /* ── ANIMATIONS ────────────────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── RESPONSIVE ────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      nav .nav-badge { display: none; }
+      .hero-stats { gap: 24px; }
+      .stat-sep { display: none; }
+      .solution-inner { grid-template-columns: 1fr; gap: 40px; }
+      .phone-wrap { display: none; }
+      .features-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .form-card { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Uni<em>Ello</em></div>
+  <div class="nav-badge"><span class="pulse"></span> Pré-lançamento aberto</div>
+  <a href="#waitlist" class="btn-nav">Quero meu convite</a>
+</nav>
+
+<div class="page">
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-eyebrow">✦ Exclusivo para estudantes universitários</div>
+    <h1>A rede que <span class="accent">conecta</span> estudantes da sua universidade.</h1>
+    <p class="hero-sub">Crie projetos, encontre colegas e faça parte da comunidade universitária que você sempre quis.</p>
+    <div class="hero-cta">
+      <a href="#waitlist" class="btn-primary">Quero meu convite <span class="arrow">→</span></a>
+      <span class="scarcity-msg"><span class="fire">🔥</span> Convites limitados para o lançamento!</span>
+    </div>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num" id="hero-count">847</div>
+        <div class="stat-label">na lista de espera</div>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat">
+        <div class="stat-num">3</div>
+        <div class="stat-label">universidades parceiras</div>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat">
+        <div class="stat-num">100%</div>
+        <div class="stat-label">gratuito no lançamento</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="section" id="problem">
+    <div class="section-tag reveal">O problema</div>
+    <h2 class="reveal">Estudar nunca foi tão <span class="accent">solitário.</span></h2>
+    <p class="section-desc reveal">As redes sociais existentes não foram feitas para a vida universitária real.</p>
+    <div class="problem-grid">
+      <div class="problem-card reveal">
+        <span class="p-emoji">🔍</span>
+        <div class="p-title">Impossível achar parceiros de projeto</div>
+        <p class="p-body">Você tem uma ideia incrível, mas não sabe quem na sua faculdade quer construir junto. Grupos de WhatsApp aleatórios não funcionam.</p>
+      </div>
+      <div class="problem-card reveal">
+        <span class="p-emoji">🙈</span>
+        <div class="p-title">Suas habilidades ficam invisíveis</div>
+        <p class="p-body">LinkedIn é para o mercado, GitHub não é rede social. Ninguém dentro da universidade sabe o que você realmente sabe fazer.</p>
+      </div>
+      <div class="problem-card reveal">
+        <span class="p-emoji">🏝️</span>
+        <div class="p-title">Cada um estudando por conta</div>
+        <p class="p-body">Mesmo dentro do campus, estudantes de cursos diferentes nunca se conectam. Um oceano de talentos que nunca se encontram.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOLUTION -->
+  <section id="solution">
+    <div class="solution-inner">
+      <div class="sol-text">
+        <div class="section-tag reveal">A solução</div>
+        <h2 class="reveal">Com UniEllo, a universidade <span class="accent">vira comunidade.</span></h2>
+        <p class="section-desc reveal" style="margin-bottom: 0;">Uma plataforma feita do zero para conectar estudantes de verdade.</p>
+        <ul class="sol-list">
+          <li class="sol-item reveal">
+            <div class="sol-icon">🤝</div>
+            <div class="sol-text">
+              <strong>Encontre parceiros para projetos</strong>
+              <span>Filtre por curso, interesses e disponibilidade. Ache as pessoas certas rapidamente.</span>
+            </div>
+          </li>
+          <li class="sol-item reveal">
+            <div class="sol-icon">📚</div>
+            <div class="sol-text">
+              <strong>Grupos de estudo e colaboração</strong>
+              <span>Crie ou entre em grupos por disciplina, projeto ou área de interesse.</span>
+            </div>
+          </li>
+          <li class="sol-item reveal">
+            <div class="sol-icon">⚡</div>
+            <div class="sol-text">
+              <strong>Perfil técnico completo</strong>
+              <span>Mostre suas stacks, projetos e redes profissionais para toda a comunidade.</span>
+            </div>
+          </li>
+          <li class="sol-item reveal">
+            <div class="sol-icon">🌐</div>
+            <div class="sol-text">
+              <strong>Networking dentro da sua uni</strong>
+              <span>Conheça pessoas de outros cursos e construa conexões que duram a vida toda.</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Phone mockup -->
+      <div class="phone-wrap reveal">
+        <div class="phone">
+          <div class="phone-notch"></div>
+          <div class="phone-header">
+            <div class="phone-avatar">CM</div>
+            <div>
+              <div class="phone-name">cristiano Macedo</div>
+              <div class="phone-uni">Afya · Ciência da Computação</div>
+            </div>
+          </div>
+          <div class="phone-post">
+            <div class="phone-post-title">🚀 Buscando co-founder</div>
+            <div class="phone-post-body">Tenho um MVP de app de carona universitária. Procuro alguém com experiência em backend Node.js ou React Native.</div>
+            <div class="phone-tags">
+              <span class="phone-tag">React Native</span>
+              <span class="phone-tag">Node.js</span>
+              <span class="phone-tag">Startup</span>
+            </div>
+          </div>
+          <div class="phone-post">
+            <div class="phone-post-title">📚 Grupo de Cálculo III</div>
+            <div class="phone-post-body">Estudos toda sexta 19h, sala 204. Temos 6 membros, aceitando mais 2.</div>
+            <div class="phone-tags">
+              <span class="phone-tag">Engenharia</span>
+              <span class="phone-tag">Matemática</span>
+            </div>
+          </div>
+          <button class="phone-btn">+ Criar projeto</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section" id="features">
+    <div style="text-align:center; max-width: 600px; margin: 0 auto 56px;">
+      <div class="section-tag reveal" style="justify-content:center;">Funcionalidades</div>
+      <h2 class="reveal">Tudo que você precisa para <span class="accent">se conectar.</span></h2>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card reveal">
+        <div class="feat-num">01</div>
+        <div class="feat-icon-wrap">🚀</div>
+        <div class="feat-title">Criação de Projetos</div>
+        <p class="feat-body">Publique seus projetos, defina as habilidades que precisa e encontre colaboradores prontos para construir junto com você.</p>
+      </div>
+      <div class="feat-card reveal">
+        <div class="feat-num">02</div>
+        <div class="feat-icon-wrap">👤</div>
+        <div class="feat-title">Perfis Detalhados</div>
+        <p class="feat-body">Mostre sua stack, interesses, projetos em andamento e links para GitHub, LinkedIn e outros portfólios.</p>
+      </div>
+      <div class="feat-card reveal">
+        <div class="feat-num">03</div>
+        <div class="feat-icon-wrap">🎓</div>
+        <div class="feat-title">Comunidade Universitária</div>
+        <p class="feat-body">Feed e grupos segmentados por universidade e curso. Conteúdo relevante para quem estuda o que você estuda.</p>
+      </div>
+      <div class="feat-card reveal">
+        <div class="feat-num">04</div>
+        <div class="feat-icon-wrap">🌐</div>
+        <div class="feat-title">Networking entre Cursos</div>
+        <p class="feat-body">Descubra estudantes de Direito, Design, Medicina e muito mais. As melhores conexões são interdisciplinares.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- COUNTER -->
+  <section id="counter">
+    <div class="counter-eyebrow reveal">Lista de espera ativa</div>
+    <div class="big-num reveal" id="big-counter">0</div>
+    <p class="counter-label reveal">estudantes já pediram convite</p>
+    <div class="counter-warning reveal">🔴 Convites limitados, não perca sua chance!</div>
+  </section>
+
+  <!-- WAITLIST FORM -->
+  <section id="waitlist">
+    <div class="waitlist-wrap">
+      <div class="section-tag reveal" style="justify-content:center;">Acesso antecipado</div>
+      <h2 class="reveal">Garanta seu convite para o <span class="accent">lançamento.</span></h2>
+      <p style="color: var(--text-2); font-size: 0.95rem;" class="reveal">Seja um dos primeiros. Preencha abaixo e garanta seu lugar na lista exclusiva.</p>
+
+      <!-- Form card -->
+      <div class="form-card reveal" id="form-card">
+        <div id="form-alert" class="form-alert"></div>
+        <form id="signup-form" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nome">Nome completo</label>
+              <input type="text" id="nome" placeholder="João Silva" autocomplete="name" />
+              <span class="field-error" id="err-nome">Nome obrigatório (mín. 2 caracteres).</span>
+            </div>
+            <div class="form-group">
+              <label for="whatsapp">WhatsApp</label>
+              <input type="tel" id="whatsapp" placeholder="(11) 99999-9999" autocomplete="tel" />
+              <span class="field-error" id="err-whatsapp">WhatsApp inválido.</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="email">E-mail</label>
+            <input type="email" id="email" placeholder="joao@email.com" autocomplete="email" />
+            <span class="field-error" id="err-email">E-mail inválido.</span>
+          </div>
+          <div class="form-group" style="position:relative;">
+            <label for="universidade">Instituição de ensino</label>
+            <input type="text" id="universidade" placeholder="Digite o nome da sua faculdade..." autocomplete="off" />
+            <div id="uni-dropdown" style="
+              display:none;
+              position:absolute;
+              top:100%; left:0; right:0;
+              background:#1E293B;
+              border:1px solid rgba(139,92,246,0.3);
+              border-radius:12px;
+              max-height:220px;
+              overflow-y:auto;
+              z-index:999;
+              margin-top:4px;
+              box-shadow:0 16px 40px rgba(0,0,0,0.4);
+            "></div>
+            <span class="field-error" id="err-universidade">Selecione uma instituição da lista.</span>
+          </div>
+          <button type="submit" class="btn-submit" id="submit-btn">
+            🔐 Quero entrar na lista de espera
+          </button>
+          <p class="form-note">🔒 Seus dados estão seguros. Sem spam, prometido.</p>
+        </form>
+      </div>
+
+      <!-- Success state -->
+      <div id="success">
+        <span class="success-icon">🎉</span>
+        <div class="success-title">Você está dentro!</div>
+        <p class="success-desc">Seu convite está reservado.<br>Entre no nosso grupo do WhatsApp e receba as novidades em primeira mão.</p>
+        <a href="#" class="btn-wpp" id="wpp-link" target="_blank">
+          💬 Entrar no grupo de espera
+        </a>
+        <p style="color: var(--text-3); font-size: 0.75rem; margin-top: 16px;">Redirecionando automaticamente em <span id="countdown">3</span>s...</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="logo">Uni<em>Ello</em></div>
+    <span class="footer-copy">© 2026 UniEllo · Feito por universitários para universitários 🎓</span>
+  </footer>
+
+</div><!-- .page -->
+
+<script>
+  // ── CONFIG ─────────────────────────────────────────────────────────
+  // ⚠️  Atualize estas URLs antes de publicar
+  const API_URL       = 'http://localhost:3001/api/leads';
+  const WPP_GROUP_URL = 'https://chat.whatsapp.com/SEU_LINK_AQUI';
+
+  // ── SCROLL REVEAL ──────────────────────────────────────────────────
+  const reveals = document.querySelectorAll('.reveal');
+  new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 60);
+        e.target._obs?.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 }).observe && (() => {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), i * 60);
+          obs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(el => obs.observe(el));
+  })();
+
+  // ── COUNTER ANIMATION ──────────────────────────────────────────────
+  async function fetchCount() {
+    try {
+      const res = await fetch(`${API_URL.replace('/leads','')}/leads/count`);
+      if (res.ok) {
+        const { total } = await res.json();
+        return Math.max(total, 847); // minimum display
+      }
+    } catch {}
+    return 847;
+  }
+
+  function animateNum(el, target, duration = 2000) {
+    const startTime = performance.now();
+    const update = (now) => {
+      const p = Math.min((now - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.floor(eased * target).toLocaleString('pt-BR');
+      if (p < 1) requestAnimationFrame(update);
+      else el.textContent = target.toLocaleString('pt-BR');
+    };
+    requestAnimationFrame(update);
+  }
+
+  let counterDone = false;
+  const bigCounter = document.getElementById('big-counter');
+  const heroCount  = document.getElementById('hero-count');
+
+  new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting && !counterDone) {
+        counterDone = true;
+        fetchCount().then(n => {
+          animateNum(bigCounter, n);
+          animateNum(heroCount, n, 1400);
+        });
+      }
+    });
+  }, { threshold: 0.3 }).observe(bigCounter);
+
+  // ── WHATSAPP MASK ──────────────────────────────────────────────────
+  document.getElementById('whatsapp').addEventListener('input', function () {
+    let v = this.value.replace(/\D/g, '').substring(0, 11);
+    if (v.length > 2) v = '(' + v.substring(0, 2) + ') ' + v.substring(2);
+    if (v.length > 10) v = v.substring(0, 10) + '-' + v.substring(10);
+    this.value = v;
+  });
+
+  // ── FORM VALIDATION ────────────────────────────────────────────────
+  function showError(id, show) {
+    document.getElementById('err-' + id).classList.toggle('show', show);
+    document.getElementById(id).style.borderColor = show ? 'rgba(239,68,68,0.6)' : '';
+  }
+
+  function validateForm() {
+    const nome  = document.getElementById('nome').value.trim();
+    const wpp   = document.getElementById('whatsapp').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const uni   = document.getElementById('universidade').value.trim();
+    const wppRe = /^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/;
+    const emRe  = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let ok = true;
+
+    showError('nome',         nome.length < 2);
+    showError('whatsapp',     !wppRe.test(wpp));
+    showError('email',        !emRe.test(email));
+    showError('universidade', !uniSelecionada || uni.length < 2);
+
+    if (nome.length < 2 || !wppRe.test(wpp) || !emRe.test(email) || !uniSelecionada || uni.length < 2) ok = false;
+    return ok;
+  }
+
+  // ── FORM SUBMIT ────────────────────────────────────────────────────
+  document.getElementById('signup-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    const btn   = document.getElementById('submit-btn');
+    const alert = document.getElementById('form-alert');
+
+    btn.disabled  = true;
+    btn.textContent = '⏳ Enviando...';
+    alert.className = 'form-alert';
+
+    const payload = {
+      nome:         document.getElementById('nome').value.trim(),
+      whatsapp:     document.getElementById('whatsapp').value.trim(),
+      email:        document.getElementById('email').value.trim(),
+      universidade: document.getElementById('universidade').value.trim(),
+    };
+
+    try {
+      const res  = await fetch(API_URL, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        // ✅ Success — show success state & redirect
+        const wppUrl = data.whatsappUrl || WPP_GROUP_URL;
+        document.getElementById('form-card').style.display = 'none';
+        document.getElementById('success').style.display   = 'block';
+        document.getElementById('wpp-link').href = wppUrl;
+
+        // Countdown redirect
+        let secs = 3;
+        const cd = document.getElementById('countdown');
+        const iv = setInterval(() => {
+          secs--;
+          cd.textContent = secs;
+          if (secs <= 0) {
+            clearInterval(iv);
+            window.open(wppUrl, '_blank');
+          }
+        }, 1000);
+
+        // Bump counters
+        const n = parseInt(bigCounter.textContent.replace(/\D/g,'')) + 1;
+        bigCounter.textContent = n.toLocaleString('pt-BR');
+        heroCount.textContent  = n.toLocaleString('pt-BR');
+
+      } else if (res.status === 409) {
+        // Email já cadastrado
+        alert.className   = 'form-alert info';
+        alert.textContent = '✅ ' + (data.error || 'Você já está na lista!');
+        btn.disabled  = false;
+        btn.textContent = '🔐 Quero entrar na lista de espera';
+
+        // Still redirect them
+        setTimeout(() => window.open(data.whatsappUrl || WPP_GROUP_URL, '_blank'), 2000);
+
+      } else {
+        throw new Error(data.error || 'Erro ao enviar.');
+      }
+
+    } catch (err) {
+      alert.className   = 'form-alert error';
+      alert.textContent = '❌ ' + err.message;
+      btn.disabled  = false;
+      btn.textContent = '🔐 Quero entrar na lista de espera';
+    }
+  });
+
+  // ── SMOOTH SCROLL ──────────────────────────────────────────────────
+  document.querySelectorAll('a[href="#waitlist"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      document.getElementById('waitlist').scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  // ── AUTOCOMPLETE DE INSTITUIÇÕES — RONDÔNIA ────────────────────────
+  const IES_RO = [
+    // ── Porto Velho ──
+    { nome: 'UNIR — Universidade Federal de Rondônia',                    cidade: 'Porto Velho' },
+    { nome: 'IFRO — Campus Porto Velho Zona Norte',                       cidade: 'Porto Velho' },
+    { nome: 'IFRO — Campus Porto Velho Calama',                           cidade: 'Porto Velho' },
+    { nome: 'FIMCA — Centro Universitário Aparício Carvalho',             cidade: 'Porto Velho' },
+    { nome: 'UNIRON — União das Escolas Superiores de Rondônia',          cidade: 'Porto Velho' },
+    { nome: 'Afya — Centro Universitário Afya Porto Velho (São Lucas)',   cidade: 'Porto Velho' },
+    { nome: 'FACIMED — Faculdade de Ciências Biomédicas de Cacoal',       cidade: 'Porto Velho' },
+    { nome: 'UNINASSAU — Faculdade Maurício de Nassau Porto Velho',       cidade: 'Porto Velho' },
+    { nome: 'UNNESA — Faculdade Metropolitana Porto Velho',               cidade: 'Porto Velho' },
+    { nome: 'FAROL — Faculdade Rondônia',                                 cidade: 'Porto Velho' },
+    { nome: 'CEULJI-ULBRA — Centro Universitário Luterano de Ji-Paraná', cidade: 'Ji-Paraná'   },
+    // ── Ji-Paraná ──
+    { nome: 'Afya — Centro Universitário Afya Ji-Paraná (São Lucas)',   cidade: 'Porto Velho' },
+    { nome: 'IFRO — Campus Ji-Paraná',                                    cidade: 'Ji-Paraná'   },
+    { nome: 'UNIR — Campus Ji-Paraná',                                    cidade: 'Ji-Paraná'   },
+    { nome: 'UNIPAR — Universidade Paranaense (polo Ji-Paraná)',          cidade: 'Ji-Paraná'   },
+    // ── Cacoal ──
+    { nome: 'FACIMED — Faculdade de Ciências Biomédicas de Cacoal',      cidade: 'Cacoal'      },
+    { nome: 'IFRO — Campus Cacoal',                                       cidade: 'Cacoal'      },
+    { nome: 'UNIR — Campus Cacoal',                                       cidade: 'Cacoal'      },
+    // ── Ariquemes ──
+    { nome: 'IFRO — Campus Ariquemes',                                    cidade: 'Ariquemes'   },
+    { nome: 'UNIR — Campus Ariquemes',                                    cidade: 'Ariquemes'   },
+    { nome: 'FAAR — Faculdade de Ariquemes',                              cidade: 'Ariquemes'   },
+    // ── Vilhena ──
+    { nome: 'IFRO — Campus Vilhena',                                      cidade: 'Vilhena'     },
+    { nome: 'UNINASSAU — Faculdade Maurício de Nassau Vilhena',           cidade: 'Vilhena'     },
+    { nome: 'UNIJIPA — Faculdade Panamericana de Ji-Paraná (polo)',       cidade: 'Vilhena'     },
+    // ── Rolim de Moura ──
+    { nome: 'UNIR — Campus Rolim de Moura',                               cidade: 'Rolim de Moura' },
+    { nome: 'FARO — Faculdade de Rolim de Moura',                         cidade: 'Rolim de Moura' },
+    // ── Guajará-Mirim ──
+    { nome: 'IFRO — Campus Guajará-Mirim',                                cidade: 'Guajará-Mirim' },
+    { nome: 'UNIR — Campus Guajará-Mirim',                                cidade: 'Guajará-Mirim' },
+    // ── Outras ──
+    { nome: 'IFRO — Campus Colorado do Oeste',                            cidade: 'Colorado do Oeste' },
+    { nome: 'IFRO — Campus Jaru',                                         cidade: 'Jaru'        },
+    { nome: 'IFRO — Campus São Miguel do Guaporé',                        cidade: 'São Miguel do Guaporé' },
+    { nome: 'UNIR — Campus Presidente Médici',                            cidade: 'Presidente Médici' },
+  ];
+
+  let uniSelecionada = false;
+  const uniInput    = document.getElementById('universidade');
+  const uniDropdown = document.getElementById('uni-dropdown');
+
+  function renderDropdown(items) {
+    if (!items.length) { uniDropdown.style.display = 'none'; return; }
+    uniDropdown.innerHTML = items.map((ies, i) => `
+      <div data-index="${i}" data-nome="${ies.nome}" style="
+        padding: 12px 16px;
+        cursor: pointer;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        transition: background 0.15s;
+      " onmouseover="this.style.background='rgba(139,92,246,0.15)'"
+         onmouseout="this.style.background='transparent'">
+        <div style="font-size:0.88rem;font-weight:600;color:#F1F5F9;">${ies.nome}</div>
+        <div style="font-size:0.72rem;color:#64748B;margin-top:2px;">📍 ${ies.cidade} — RO</div>
+      </div>
+    `).join('');
+    uniDropdown.style.display = 'block';
+
+    uniDropdown.querySelectorAll('[data-index]').forEach(el => {
+      el.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        uniInput.value  = el.dataset.nome;
+        uniSelecionada  = true;
+        uniDropdown.style.display = 'none';
+        document.getElementById('err-universidade').classList.remove('show');
+        uniInput.style.borderColor = '';
+      });
+    });
+  }
+
+  uniInput.addEventListener('input', () => {
+    uniSelecionada = false;
+    const q = uniInput.value.toLowerCase().trim();
+    if (q.length < 2) { uniDropdown.style.display = 'none'; return; }
+    const filtered = IES_RO.filter(ies =>
+      ies.nome.toLowerCase().includes(q) || ies.cidade.toLowerCase().includes(q)
+    );
+    renderDropdown(filtered);
+  });
+
+  uniInput.addEventListener('blur', () => {
+    setTimeout(() => { uniDropdown.style.display = 'none'; }, 150);
+  });
+
+  uniInput.addEventListener('focus', () => {
+    if (uniInput.value.length >= 2 && !uniSelecionada) {
+      const q = uniInput.value.toLowerCase();
+      renderDropdown(IES_RO.filter(ies =>
+        ies.nome.toLowerCase().includes(q) || ies.cidade.toLowerCase().includes(q)
+      ));
+    }
+  });
+</script>
+</body>
+</html>
