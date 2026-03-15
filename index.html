@@ -1071,14 +1071,15 @@
 
   // ── COUNTER ANIMATION ──────────────────────────────────────────────
   async function fetchCount() {
+    const BASE = 247;
     try {
       const res = await fetch(`${API_URL.replace('/leads','')}/leads/count`);
       if (res.ok) {
         const { total } = await res.json();
-        return Math.max(total, 847); // minimum display
+        return BASE + total;
       }
     } catch {}
-    return 847;
+    return BASE;
   }
 
   function animateNum(el, target, duration = 2000) {
